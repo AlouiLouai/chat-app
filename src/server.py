@@ -1,6 +1,7 @@
 from flask import Flask, jsonify
 from flask_socketio import SocketIO
 from src.database import DatabaseService, db
+from flask_cors import CORS
 from src.models.user import User
 
 app = Flask(__name__)
@@ -18,7 +19,10 @@ except Exception as e:
     print(f"Error creating database tables: {e}")
     
 # Initialize SocketIO
-socketio = SocketIO(app, cors_allowed_origins="http://127.0.0.1:5500")
+socketio = SocketIO(app, cors_allowed_origins=["http://localhost:3000"])
+
+# Enable CORS for your Next.js app on localhost:3000
+CORS(app, origins=["http://localhost:3000"])
 
 @socketio.on('connect')
 def handle_connect():
