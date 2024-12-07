@@ -35,11 +35,16 @@ class AuthService:
         Handles user login by checking credentials and returning access and refresh tokens.
         """
         user = User.query.filter_by(username=username).first()
-        if user and check_password_hash(user.password_hash, password):
+        if user and user.check_password(password):
+            print("Password is correct, generating tokens...")
             # Create access token (JWT)
             access_token = create_access_token(identity=user.id)
             # Generate refresh token (This should be handled by TokenService)
             refresh_token = TokenService.generate_refresh_token(user)
+            if not access_token or not refresh_token:
+                print("Error generating tokens")
+            else:
+                print("Tokens generated successfully")
             # Store the refresh token in the database
             TokenService.store_refresh_token(user, refresh_token)
             return access_token, refresh_token

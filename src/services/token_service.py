@@ -1,14 +1,13 @@
-import uuid
+from src.database import db 
 from datetime import datetime, timedelta
 from src.models.token import Token
-from flask import current_app
+import uuid
 
 class TokenService:
     @staticmethod
     def generate_refresh_token(user):
         """
         Generates a refresh token using the user's ID and a random string.
-        This is an example, and you can modify this for stronger generation methods.
         """
         # Use UUID or any other strategy for secure random string generation
         return str(user.id) + "-" + str(uuid.uuid4())
@@ -28,10 +27,12 @@ class TokenService:
                 refresh_token=refresh_token,
                 expired_at=expired_at
             )
-            current_app.db.session.add(token)
-            current_app.db.session.commit()
+            # Use the db session directly (from the imported db instance)
+            db.session.add(token)
+            db.session.commit()
         except Exception as e:
-            current_app.logger.error(f"Error storing refresh token: {str(e)}")
+            db.session.rollback()  # Rollback in case of failure
+            print(f"Error storing refresh token: {str(e)}")
             raise
 
     @staticmethod
@@ -52,7 +53,7 @@ class TokenService:
         """
         token = Token.query.filter_by(refresh_token=refresh_token).first()
         if token:
-            current_app.db.session.delete(token)
-            current_app.db.session.commit()
+            db.session.delete(token)
+            db.session.commit()
             return True
         return False

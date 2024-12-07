@@ -3,7 +3,7 @@ from src.services.auth_service import AuthService
 from src.models.user import User
 from src.database import db
 
-auth_controller = Blueprint('auth_controller', __name__)
+auth_controller = Blueprint('auth', __name__)
 
 @auth_controller.route('/register', methods=['POST'])
 def register():
