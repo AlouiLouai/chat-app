@@ -10,8 +10,6 @@ class User(db.Model):
     email = Column(String(120), unique=True, nullable=False)
     password_hash = Column(String(128), nullable=False)
     created_at = Column(DateTime, default=datetime.now(timezone.utc))
-    created_at = Column(DateTime, default=datetime.now(timezone.utc))
-    created_at = Column(DateTime, default=datetime.now(timezone.utc))
     last_seen = Column(DateTime, default=datetime.now(timezone.utc), onupdate=datetime.now(timezone.utc))
     is_active = Column(Boolean, default=True)
     
