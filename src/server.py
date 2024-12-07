@@ -1,3 +1,4 @@
+import os
 from flask import Flask, jsonify
 from flask_jwt_extended import JWTManager
 from flask_socketio import SocketIO
@@ -9,7 +10,7 @@ from src.services.socket_service import SocketService
 
 app = Flask(__name__)
 
-app.config['JWT_SECRET_KEY'] = 'your_jwt_secret_key'
+app.config['JWT_SECRET_KEY'] = os.getenv("JWT_SECRET_KEY")
 
 
 # Initialize db with the app
@@ -24,10 +25,11 @@ except Exception as e:
     print(f"Error creating database tables: {e}")
     
 # Initialize SocketIO
-socketio = SocketIO(app, cors_allowed_origins=["http://localhost:3000"])
+socketio = SocketIO(app, cors_allowed_origins=[os.getenv("FRONTEND_APP")])
 
-# Enable CORS for your Next.js app on localhost:3000
-CORS(app, origins=["http://localhost:3000"])
+# Enable CORS for the auth controller only
+#CORS(auth_controller, resources={r"/*": {"origins": "http://localhost:3000"}})
+CORS(app, origins=[os.getenv("FRONTEND_APP")])
 
 socket_service = SocketService(app)
 
