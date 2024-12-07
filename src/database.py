@@ -25,11 +25,8 @@ class DatabaseService:
     def _check_connection(self):
         """Check if the database connection is successful."""
         try:
-            # Create an engine to test the connection
             engine = create_engine(self._app.config["SQLALCHEMY_DATABASE_URI"])
-            connection = engine.connect()
-            connection.close()
-            print("Database connected successfully!")
+            with engine.connect() as connection:
+                print("Database connected successfully!")
         except exc.SQLAlchemyError as e:
             print(f"Database connection failed: {e}")
-            raise e  # Reraise the exception to halt the app startup if connection fails
