@@ -1,4 +1,5 @@
 from sqlalchemy import Column, Integer, String, DateTime, Boolean
+from sqlalchemy.orm import relationship
 from werkzeug.security import generate_password_hash, check_password_hash
 from src.database import db
 from datetime import datetime, timezone
@@ -13,6 +14,9 @@ class User(db.Model):
     created_at = Column(DateTime, default=datetime.now(timezone.utc))
     last_seen = Column(DateTime, default=datetime.now(timezone.utc), onupdate=datetime.now(timezone.utc))
     is_active = Column(Boolean, default=True)
+    
+     # Relationship with Token
+    tokens = relationship('Token', back_populates='user', cascade='all, delete-orphan')
 
     def set_password(self, password):
         """
