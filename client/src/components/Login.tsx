@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Toast } from "@/components/ui/toast";
+import { useToast } from "@/hooks/use-toast";
 import { Label } from "@/components/ui/label";
 import { AuthService } from "@/services/auth.services";
 import { useRouter } from "next/navigation";
@@ -16,6 +16,7 @@ export default function LoginPage() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const router = useRouter();
+  const { toast } = useToast(); // Use the toast function provided by useToast
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -32,9 +33,10 @@ export default function LoginPage() {
       localStorage.setItem("refresh_token", refresh_token);
 
       // Display success toast
-      Toast({
+      toast({
         title: "Login Successful",
-        duration: 5000,
+        description: "You have logged in successfully.",
+        duration: 5000,  // 5 seconds duration
       });
 
       // Navigate to the protected dashboard page
@@ -44,8 +46,9 @@ export default function LoginPage() {
       setErrorMessage(error.message || "Login failed. Please try again.");
 
       // Display error toast
-      Toast({
+      toast({
         title: "Login Failed",
+        description: error.message || "Invalid username or password.",
         duration: 5000,
       });
     } finally {

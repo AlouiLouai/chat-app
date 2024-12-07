@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { useToast } from "@/hooks/use-toast";
 import { Label } from "@/components/ui/label";
 import { Toast } from "@/components/ui/toast";
 import { AuthService } from "@/services/auth.services";
@@ -15,6 +16,7 @@ export default function RegisterPage() {
   const [password, setPassword] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const router = useRouter();
+  const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -22,20 +24,22 @@ export default function RegisterPage() {
 
     try {
       const userData = { username, email, password };
-      const { message } = await AuthService.register(userData);
+      await AuthService.register(userData);
 
-      // On successful registration
-      Toast({
+
+      toast({
         title: "Registration Successful",
-        duration: 5000,
+        description: "You have registered successfully.",
+        duration: 5000,  // 5 seconds duration
       });
 
       setTimeout(() => {
         router.push("/auth/login"); // Redirect to the login page after a delay
       }, 2000); // Optional delay to show the success message
     } catch (error: any) {
-      Toast({
-        title: "Registration Failed",
+      toast({
+        title: "Register Failed",
+        description: error.message,
         duration: 5000,
       });
     } finally {
