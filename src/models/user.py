@@ -1,15 +1,17 @@
 from sqlalchemy import Column, Integer, String, DateTime, Boolean
 from werkzeug.security import generate_password_hash, check_password_hash
 from src.database import db
-from datetime import datetime
+from datetime import datetime, timezone
 
 class User(db.Model):
     id = Column(Integer, primary_key=True)
     username = Column(String(80), unique=True, nullable=False)
     email = Column(String(120), unique=True, nullable=False)
     password_hash = Column(String(128), nullable=False)
-    created_at = Column(DateTime, default=datetime.utcnow)
-    last_seen = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = Column(DateTime, default=datetime.now(timezone.utc))
+    created_at = Column(DateTime, default=datetime.now(timezone.utc))
+    created_at = Column(DateTime, default=datetime.now(timezone.utc))
+    last_seen = Column(DateTime, default=datetime.now(timezone.utc), onupdate=datetime.now(timezone.utc))
     is_active = Column(Boolean, default=True)
 
     def set_password(self, password):
@@ -35,4 +37,4 @@ class User(db.Model):
         """
         Update the `last_seen` timestamp.
         """
-        self.last_seen = datetime.now(datetime.timezone.utc)
+        self.last_seen = datetime.now(timezone.utc)
