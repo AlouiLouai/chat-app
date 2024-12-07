@@ -1,10 +1,10 @@
 from werkzeug.security import check_password_hash
 from flask_jwt_extended import create_access_token
-from datetime import timedelta
 from src.models.user import User
 from src.models.token import Token
 from flask import current_app
 from sqlalchemy.exc import SQLAlchemyError
+from src.services.token_service import TokenService
 
 class AuthService:
     def __init__(self, db):
