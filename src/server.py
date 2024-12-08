@@ -1,6 +1,7 @@
 import os
 from flask import Flask, jsonify
 from flask_jwt_extended import JWTManager
+from flask_mail import Mail
 from flask_socketio import SocketIO
 from src.controllers.auth_controller import auth_controller
 from src.database import DatabaseService, db
@@ -11,6 +12,13 @@ from src.services.socket_service import SocketService
 app = Flask(__name__)
 
 app.config['JWT_SECRET_KEY'] = os.getenv("JWT_SECRET_KEY")
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'  # Or 'smtp_container' if running in Docker
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = False
+app.config['MAIL_USE_SSL'] = False
+app.config['MAIL_USERNAME'] = 'louaialoui1993@gmail.com'
+app.config['MAIL_PASSWORD'] = 'ktmobyduilipiteb'
+app.config['MAIL_DEFAULT_SENDER'] = 'louaialoui1993@gmail.com'
 
 
 # Initialize db with the app
@@ -34,6 +42,15 @@ CORS(app, origins=[os.getenv("FRONTEND_APP")])
 socket_service = SocketService(app)
 
 jwt = JWTManager(app)
+
+mail = Mail(app)
+
+with app.app_context():
+    try:
+        connection = mail.connect()
+        print("SMTP connection successful!")
+    except Exception as e:
+        print(f"Failed to connect to SMTP server: {e}")
 
 # Register the auth_controller blueprint with the app
 app.register_blueprint(auth_controller, url_prefix='/auth')

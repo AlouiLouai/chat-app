@@ -1,14 +1,70 @@
+from itsdangerous import URLSafeTimedSerializer
 from werkzeug.security import check_password_hash
 from flask_jwt_extended import create_access_token
 from src.models.user import User
 from src.models.token import Token
-from flask import current_app
+from flask import current_app, url_for
 from sqlalchemy.exc import SQLAlchemyError
+from src.services.email_service import EmailService
 from src.services.token_service import TokenService
 
 class AuthService:
     def __init__(self, db):
         self.db = db
+        self.email_service = EmailService
+        secret_key = current_app.config.get('SECRET_KEY')
+        if not secret_key:
+            raise ValueError("SECRET_KEY is not set in the configuration.")
+        self.serializer = URLSafeTimedSerializer(secret_key)
+        
+    def forgot_password(self, email):
+        """
+        Sends a password reset email to the user.
+        """
+        user = User.query.filter_by(email=email).first()
+        if not user:
+            return False, "Email address not found."
+
+        try:
+            # Generate a secure reset token
+            reset_token = self.serializer.dumps(email, salt='password-reset-salt')
+            reset_url = url_for('auth.reset_password', token=reset_token, _external=True)
+
+            # Email content
+            subject = "Password Reset Request"
+            body = f"Hi {user.username},\n\nClick the link below to reset your password:\n{reset_url}\n\nIf you did not request this, please ignore this email."
+            html = f"""<p>Hi {user.username},</p>
+                       <p>Click the link below to reset your password:</p>
+                       <a href="{reset_url}">{reset_url}</a>
+                       <p>If you did not request this, please ignore this email.</p>"""
+
+            # Use the EmailService to send the email
+            if self.email_service.send_email(subject, [email], body, html):
+                return True, "Password reset email sent successfully."
+            else:
+                return False, "Failed to send password reset email."
+        except Exception as e:
+            current_app.logger.error(f"Error in forgot_password: {str(e)}")
+            return False, "An error occurred. Please try again later."
+        
+    def reset_password(self, token, new_password):
+        """
+        Resets the user's password using a valid token.
+        """
+        try:
+            # Validate the reset token
+            email = self.serializer.loads(token, salt='password-reset-salt', max_age=3600)  # 1-hour expiration
+            user = User.query.filter_by(email=email).first()
+            if not user:
+                return False, "Invalid token or user not found."
+
+            # Update the user's password
+            user.set_password(new_password)
+            self.db.session.commit()
+            return True, "Password reset successfully."
+        except Exception as e:
+            current_app.logger.error(f"Error in reset_password: {str(e)}")
+            return False, "Invalid or expired token."
         
     def register(self, username, email, password):
         """

@@ -51,10 +51,13 @@ def forgot_password():
     data = request.get_json()
     email = data.get('email')
 
-    auth_service = AuthService(db)
-    message = auth_service.forgot_password(email)
+    if not email:
+        return jsonify({"message": "Email is required"}), 400
 
-    if "sent" in message:
+    auth_service = AuthService(db)
+    success, message = auth_service.forgot_password(email)
+
+    if success:
         return jsonify({"message": message}), 200
     return jsonify({"message": message}), 400
 
@@ -63,9 +66,12 @@ def reset_password(token):
     data = request.get_json()
     new_password = data.get('new_password')
 
-    auth_service = AuthService(db)
-    message = auth_service.reset_password(token, new_password)
+    if not new_password:
+        return jsonify({"message": "New password is required"}), 400
 
-    if "success" in message:
+    auth_service = AuthService(db)
+    success, message = auth_service.reset_password(token, new_password)
+
+    if success:
         return jsonify({"message": message}), 200
     return jsonify({"message": message}), 400
