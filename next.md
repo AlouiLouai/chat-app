@@ -1,7 +1,3 @@
-# forgot password 
-# reset password 
-# implement the auth to front
+# user profile
 # login with google
-
-
-MATANSECH TPULL MAIN KHATER AMALT MERGE 
+# next js middleware that block connected users to access content

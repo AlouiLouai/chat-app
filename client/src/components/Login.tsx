@@ -102,6 +102,14 @@ export default function LoginPage() {
               </Link>
             </p>
           </div>
+          <div className="mt-4 text-center">
+            <p className="text-sm">
+              Forgot password?{" "}
+              <Link href="/auth/forgot-password" className="text-blue-600 hover:text-blue-800">
+                Send link to you email here
+              </Link>
+            </p>
+          </div>
         </CardContent>
       </Card>
     </div>

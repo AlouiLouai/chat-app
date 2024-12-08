@@ -28,7 +28,7 @@ class AuthService:
         try:
             # Generate a secure reset token
             reset_token = self.serializer.dumps(email, salt='password-reset-salt')
-            reset_url = url_for('auth.reset_password', token=reset_token, _external=True)
+            reset_url = f'http://localhost:3000/auth/reset-password/{reset_token}'
 
             # Email content
             subject = "Password Reset Request"

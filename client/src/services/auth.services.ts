@@ -37,24 +37,25 @@ export class AuthService {
   }
 
   // Forgot Password
-  // static async forgotPassword(email: ForgotPasswordData): Promise<{ message: string }> {
-  //   try {
-  //     const response = await axios.post(`${API_BASE_URL}/auth/forgot-password`, { email });
-  //     return response.data; // Includes success or failure message
-  //   } catch (error: any) {
-  //     console.error('Forgot password request failed:', error.response?.data?.message || error.message);
-  //     throw new Error(error.response?.data?.message || 'Forgot password request failed');
-  //   }
-  // }
+  static async forgotPassword(email: ForgotPasswordData): Promise<{ message: string }> {
+    try {
+      const response = await axios.post(`${API_BASE_URL}/auth/forgot-password`, email);
+      console.log('response from forgot password :', {response})
+      return response.data; // Includes success or failure message
+    } catch (error: any) {
+      console.error('Forgot password request failed:', error.response?.data?.message || error.message);
+      throw new Error(error.response?.data?.message || 'Forgot password request failed');
+    }
+  }
 
   // Reset Password
-  // static async resetPassword(token: string, newPassword: string): Promise<{ message: string }> {
-  //   try {
-  //     const response = await axios.post(`${API_BASE_URL}/auth/reset-password/${token}`, { new_password: newPassword });
-  //     return response.data; // Includes success or failure message
-  //   } catch (error: any) {
-  //     console.error('Password reset failed:', error.response?.data?.message || error.message);
-  //     throw new Error(error.response?.data?.message || 'Password reset failed');
-  //   }
-  // }
+  static async resetPassword(token: string, newPassword: string): Promise<{ message: string }> {
+    try {
+      const response = await axios.post(`${API_BASE_URL}/auth/reset-password/${token}`, { new_password: newPassword });
+      return response.data; // Includes success or failure message
+    } catch (error: any) {
+      console.error('Password reset failed:', error.response?.data?.message || error.message);
+      throw new Error(error.response?.data?.message || 'Password reset failed');
+    }
+  }
 }
