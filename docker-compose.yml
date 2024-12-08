@@ -45,16 +45,6 @@ services:
     networks:
       - flask-network
 
-  smtp:
-    image: mailhog/mailhog:latest
-    container_name: smtp_container
-    restart: always
-    ports:
-      - "8025:8025" # Web UI for viewing emails
-      - "1025:1025" # SMTP service port
-    networks:
-      - flask-network
-
 networks:
   flask-network:
     driver: bridge

@@ -39,7 +39,8 @@ export class AuthService {
   // Forgot Password
   static async forgotPassword(email: ForgotPasswordData): Promise<{ message: string }> {
     try {
-      const response = await axios.post(`${API_BASE_URL}/auth/forgot-password`, { email });
+      const response = await axios.post(`${API_BASE_URL}/auth/forgot-password`, email);
+      console.log('response from forgot password :', {response})
       return response.data; // Includes success or failure message
     } catch (error: any) {
       console.error('Forgot password request failed:', error.response?.data?.message || error.message);
