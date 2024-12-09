@@ -3,7 +3,7 @@ from minio.error import S3Error
 import os
 from werkzeug.utils import secure_filename
 
-class MinioService:
+class BucketService:
     def __init__(self):
         self.client = Minio(
             endpoint=os.getenv("MINIO_ENDPOINT"),
@@ -30,6 +30,7 @@ class MinioService:
                 length=file.content_length,
                 content_type=file.mimetype,
             )
+            
 
             # Generate the URL for the uploaded image
             image_url = f"http://{os.getenv('MINIO_ENDPOINT')}/{self.bucket_name}/{filename}"
