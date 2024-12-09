@@ -3,6 +3,7 @@ from flask import Flask, jsonify
 from flask_jwt_extended import JWTManager
 from flask_mail import Mail
 from flask_socketio import SocketIO
+from src.controllers.test_minio import test_minio
 from src.controllers.auth_controller import auth_controller
 from src.database import DatabaseService, db
 from flask_cors import CORS
@@ -54,6 +55,7 @@ with app.app_context():
 
 # Register the auth_controller blueprint with the app
 app.register_blueprint(auth_controller, url_prefix='/auth')
+app.register_blueprint(test_minio, url_prefix='/minio')
 
 @app.route("/")
 def index():
