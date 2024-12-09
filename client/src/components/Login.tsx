@@ -2,13 +2,20 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { Label } from "@/components/ui/label";
 import { AuthService } from "@/services/auth.services";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Cookie from "js-cookie";
 
 export default function LoginPage() {
   const [username, setUsername] = useState<string>("");
@@ -26,17 +33,21 @@ export default function LoginPage() {
     try {
       // Call the AuthService login function
       const credentials = { username, password };
-      const { access_token, refresh_token } = await AuthService.login(credentials);
+      const { access_token, refresh_token } = await AuthService.login(
+        credentials
+      );
 
       // Save tokens (you can store them in cookies, localStorage, or a state manager)
-      localStorage.setItem("access_token", access_token);
-      localStorage.setItem("refresh_token", refresh_token);
+
+      // Save tokens in cookies
+      Cookie.set("access_token", access_token, { expires: 1 }); // Set token with a 7-day expiry
+      Cookie.set("refresh_token", refresh_token, { expires: 1 }); // Set refresh token as well
 
       // Display success toast
       toast({
         title: "Login Successful",
         description: "You have logged in successfully.",
-        duration: 5000,  // 5 seconds duration
+        duration: 5000, // 5 seconds duration
       });
 
       // Navigate to the protected dashboard page
@@ -61,7 +72,9 @@ export default function LoginPage() {
       <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle>Login</CardTitle>
-          <CardDescription>Enter your credentials to access your account</CardDescription>
+          <CardDescription>
+            Enter your credentials to access your account
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit}>
@@ -88,7 +101,9 @@ export default function LoginPage() {
                   required
                 />
               </div>
-              {errorMessage && <p className="text-red-500 text-sm">{errorMessage}</p>}
+              {errorMessage && (
+                <p className="text-red-500 text-sm">{errorMessage}</p>
+              )}
               <Button type="submit" className="w-full" disabled={loading}>
                 {loading ? "Logging in..." : "Log in"}
               </Button>
@@ -97,7 +112,10 @@ export default function LoginPage() {
           <div className="mt-4 text-center">
             <p className="text-sm">
               Don't have an account?{" "}
-              <Link href="/auth/register" className="text-blue-600 hover:text-blue-800">
+              <Link
+                href="/auth/register"
+                className="text-blue-600 hover:text-blue-800"
+              >
                 Register here
               </Link>
             </p>
@@ -105,7 +123,10 @@ export default function LoginPage() {
           <div className="mt-4 text-center">
             <p className="text-sm">
               Forgot password?{" "}
-              <Link href="/auth/forgot-password" className="text-blue-600 hover:text-blue-800">
+              <Link
+                href="/auth/forgot-password"
+                className="text-blue-600 hover:text-blue-800"
+              >
                 Send link to you email here
               </Link>
             </p>

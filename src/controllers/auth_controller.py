@@ -1,4 +1,5 @@
 from flask import Blueprint, request, jsonify
+from flask_jwt_extended import get_jwt_identity, jwt_required
 from src.services.auth_service import AuthService
 from src.models.user import User
 from src.database import db
@@ -75,3 +76,10 @@ def reset_password(token):
     if success:
         return jsonify({"message": message}), 200
     return jsonify({"message": message}), 400
+
+@auth_controller.route('/test-guard', methods=['GET'])
+@jwt_required()
+def test_guard():
+    current_user = get_jwt_identity()
+    return jsonify(logged_in_as=current_user), 200
+        

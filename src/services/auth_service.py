@@ -94,7 +94,7 @@ class AuthService:
         if user and user.check_password(password):
             print("Password is correct, generating tokens...")
             # Create access token (JWT)
-            access_token = create_access_token(identity=user.id)
+            access_token = create_access_token(identity=user.username)
             # Generate refresh token (This should be handled by TokenService)
             refresh_token = TokenService.generate_refresh_token(user)
             if not access_token or not refresh_token:
