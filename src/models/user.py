@@ -13,6 +13,9 @@ class User(db.Model):
     last_seen = Column(DateTime, default=datetime.now(timezone.utc), onupdate=datetime.now(timezone.utc))
     is_active = Column(Boolean, default=True)
     
+     # New field for storing image URL
+    image_url = Column(String(255), nullable=True)
+    
      # Relationship with Token
     tokens = relationship('Token', back_populates='user', cascade='all, delete-orphan')
 
