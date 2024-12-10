@@ -28,30 +28,25 @@ export default function ForgotPasswordPage() {
     setLoading(true);
 
     try {
-      // Call the AuthService forgot-password function
       await AuthService.forgotPassword({ email });
 
-      // Display success toast
       toast({
         title: "Email sent!",
         description: "Check your email to update password.",
-        duration: 5000, // 5 seconds duration
+        duration: 5000,
       });
 
-      // Navigate to the protected dashboard page
-      router.push("/auth/login"); // Redirect to the dashboard
+      router.push("/auth/login");
     } catch (error: any) {
-      // Handle login failure
       setErrorMessage(error.message || "Email sent failed. Please try again.");
 
-      // Display error toast
       toast({
         title: "Sent Email Failed",
         description: error.message || "Invalid email",
         duration: 5000,
       });
     } finally {
-      setLoading(false); // Reset loading state
+      setLoading(false);
     }
   };
 
@@ -59,7 +54,7 @@ export default function ForgotPasswordPage() {
     <div className="min-h-screen flex items-center justify-center bg-background">
       <Card className="w-full max-w-md">
         <CardHeader>
-          <CardTitle>Forgot password ?</CardTitle>
+          <CardTitle>Forgot password?</CardTitle>
           <CardDescription>
             Enter your email to get the reset password link
           </CardDescription>
@@ -82,10 +77,19 @@ export default function ForgotPasswordPage() {
                 <p className="text-red-500 text-sm">{errorMessage}</p>
               )}
               <Button type="submit" className="w-full" disabled={loading}>
-                {loading ? "Sending in..." : "Send"}
+                {loading ? "Sending..." : "Send"}
               </Button>
             </div>
           </form>
+          <div className="mt-4 flex justify-center">
+            <Button
+              variant="outline"
+              onClick={() => router.push("/main")}
+              className="w-full"
+            >
+              Return to Main
+            </Button>
+          </div>
         </CardContent>
       </Card>
     </div>

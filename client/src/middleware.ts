@@ -10,7 +10,11 @@ export function middleware(req: NextRequest) {
 
   if (
     !token &&
-    (req.nextUrl.pathname === "/" || req.nextUrl.pathname === "/main")
+    (
+      req.nextUrl.pathname === "/" ||
+       req.nextUrl.pathname === "/main" ||
+      req.nextUrl.pathname === "/profile"
+      )
   ) {
     return NextResponse.redirect(new URL("/auth/login", req.url));
   }
