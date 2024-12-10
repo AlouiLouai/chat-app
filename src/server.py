@@ -32,7 +32,7 @@ socketio = SocketIO(app, cors_allowed_origins=[os.getenv("FRONTEND_APP")])
 
 # Enable CORS for the auth controller only
 #CORS(auth_controller, resources={r"/*": {"origins": "http://localhost:3000"}})
-CORS(app, origins=[os.getenv("FRONTEND_APP")])
+CORS(app, origins=[os.getenv("FRONTEND_APP")], supports_credentials=True)
 
 socket_service = SocketService(app)
 

@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from flask_jwt_extended import get_jwt_identity, jwt_required
+from flask_jwt_extended import get_jwt_identity, jwt_required, set_access_cookies
 from src.services.auth_service import AuthService
 from src.models.user import User
 from src.database import db
@@ -27,13 +27,18 @@ def login():
     data = request.get_json()
     username = data.get('username')
     password = data.get('password')
-
     auth_service = AuthService(db)
     access_token, refresh_token = auth_service.login(username, password)
-
     if access_token:
-        return jsonify({"access_token": access_token, "refresh_token": refresh_token}), 200
-    return jsonify({"message": refresh_token}), 401  # Invalid username or password
+        # Create a response object
+        response = jsonify({"access_token": access_token, "refresh_token": refresh_token})
+        # Set the access token in the cookie
+        set_access_cookies(response, access_token)
+        # Return the response with the cookie set
+        return response, 200
+    # If login fails, return an error message
+    return jsonify({"message": refresh_token}), 401
+
 
 @auth_controller.route('/logout', methods=['POST'])
 def logout():

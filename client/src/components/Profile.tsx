@@ -66,10 +66,10 @@ export default function ProfilePage() {
       if (result.success) {
         toast({
           title: "Profile updated successfully!",
-          description: "redirecting to main...",
+          description: "Redirecting to main...",
           duration: 5000, // 5 seconds duration
         });
-        router.push("/main")
+        router.push("/main");
       } else {
         alert(`Failed to update profile: ${result.message}`);
       }
@@ -77,6 +77,10 @@ export default function ProfilePage() {
       console.error("Error updating profile:", error);
       alert("An error occurred while updating the profile.");
     }
+  };
+
+  const handleReturnToMain = () => {
+    router.push("/main");
   };
 
   return (
@@ -151,6 +155,13 @@ export default function ProfilePage() {
               </div>
               <Button className="w-full" onClick={handleProfileUpdate}>
                 Update Profile
+              </Button>
+              <Button
+                variant="outline"
+                className="w-full"
+                onClick={handleReturnToMain}
+              >
+                Return to Main
               </Button>
             </div>
           </div>

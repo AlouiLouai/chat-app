@@ -91,7 +91,15 @@ export default function LoginPage() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="password">Password</Label>
+                  <Link
+                    href="/auth/forgot-password"
+                    className="text-sm text-blue-600 hover:text-blue-800"
+                  >
+                    Forgot password?
+                  </Link>
+                </div>
                 <Input
                   id="password"
                   type="password"
@@ -117,17 +125,6 @@ export default function LoginPage() {
                 className="text-blue-600 hover:text-blue-800"
               >
                 Register here
-              </Link>
-            </p>
-          </div>
-          <div className="mt-4 text-center">
-            <p className="text-sm">
-              Forgot password?{" "}
-              <Link
-                href="/auth/forgot-password"
-                className="text-blue-600 hover:text-blue-800"
-              >
-                Send link to you email here
               </Link>
             </p>
           </div>

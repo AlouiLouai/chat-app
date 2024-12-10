@@ -13,7 +13,9 @@ import {
 import { User, Settings, LogOut } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
-import { ProfileService } from "@/services/profile.services"; // Ensure you import the ProfileService
+import Cookie from "js-cookie";
+import { ProfileService } from "@/services/profile.services";
+import { AuthService } from "@/services/auth.services";
 
 export function Navbar() {
   const router = useRouter();
@@ -31,7 +33,7 @@ export function Navbar() {
         setUserProfile({
           username: profile.username,
           email: profile.email,
-          image_url: profile.image_url || "/avatars/default-avatar.png", // Set a default image if none exists
+          image_url: profile.image_url, // Set a default image if none exists
         });
       } catch (error) {
         console.error("Error fetching profile:", error);
@@ -40,6 +42,25 @@ export function Navbar() {
 
     fetchProfile();
   }, []);
+
+  // Logout handler
+  const handleLogout = async () => {
+    try {
+      const refreshToken = Cookie.get("refresh_token");
+
+      if (!refreshToken) {
+        throw new Error("Refresh token not found");
+      }
+
+      await AuthService.logout(refreshToken); // Call logout service
+      Cookie.remove("access_token"); // Remove cookies
+      Cookie.remove("refresh_token");
+      router.push("/auth/login"); // Redirect to login
+    } catch (error: any) {
+      console.error("Logout failed:", error.message);
+      alert("Failed to log out. Please try again.");
+    }
+  };
 
   return (
     <nav className="flex items-center justify-between p-4 bg-background border-b">
@@ -60,9 +81,7 @@ export function Navbar() {
             <DropdownMenuLabel className="font-normal">
               <div className="flex flex-col space-y-1">
                 <p className="text-sm font-medium leading-none">{userProfile.username}</p>
-                <p className="text-xs leading-none text-muted-foreground">
-                  {userProfile.email}
-                </p>
+                <p className="text-xs leading-none text-muted-foreground">{userProfile.email}</p>
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
@@ -75,7 +94,7 @@ export function Navbar() {
               <span>Settings</span>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={handleLogout}>
               <LogOut className="mr-2 h-4 w-4" />
               <span>Log out</span>
             </DropdownMenuItem>
