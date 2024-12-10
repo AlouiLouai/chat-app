@@ -13,7 +13,7 @@ services:
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
     volumes:
       - minio_data:/data  # Persistent data storage for MinIO
-    command: server /data --console-address ":9001" --access-control-allow-origin="*"
+    command: server /data --console-address ":9001"
     networks:
       - flask-network
   # PostgreSQL service
