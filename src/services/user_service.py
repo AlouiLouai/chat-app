@@ -50,6 +50,7 @@ class UserService:
             # Upload the profile picture if provided
             if file:
                 upload_result = bucket_service.upload_image(file)
+                print(f"upload_result {upload_result}")
                 if not upload_result["success"]:
                     return False, upload_result["error"]
                 # Save the uploaded image URL to the user's profile

@@ -2,6 +2,7 @@ from flask import Blueprint, current_app, request, jsonify
 from flask_jwt_extended import get_jwt_identity, jwt_required
 from src.models.user import User
 from src.services.user_service import UserService
+from src.database import db
 
 user_controller = Blueprint('user', __name__)
     
@@ -19,7 +20,7 @@ def get_profile():
     # Retrieve the user ID from the user object
     user_id = user.id
     # Initialize UserService instance
-    user_service = UserService(db=current_app.config['db'])
+    user_service = UserService(db=db)
     profile, message = user_service.get_profile(user_id)
     if not profile:
         return jsonify({"success": False, "error": message }), 404
@@ -43,7 +44,7 @@ def update_profile():
     file = request.files.get("file")  # Optional file for profile picture
 
     # Initialize UserService instance
-    user_service = UserService(db=current_app.config['db'])
+    user_service = UserService(db=db)
 
     # Call the update_profile method
     success, message = user_service.update_profile(username=current_user, data=data, file=file)

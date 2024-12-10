@@ -1,3 +1,4 @@
+from datetime import timedelta
 from minio import Minio
 from minio.error import S3Error
 import os
@@ -30,6 +31,16 @@ class BucketService:
                 length=file.content_length,
                 content_type=file.mimetype,
             )
+            
+            # Generate the pre-signed URL for private access to the uploaded image
+            expires_duration = timedelta(seconds=3600)
+            images_url = self.client.presigned_get_object(
+                bucket_name=self.bucket_name,
+                object_name=filename,
+                expires=expires_duration  # URL valid for 1 hour
+            )
+            
+            print(f"image_url is {images_url}")
             
 
             # Generate the URL for the uploaded image

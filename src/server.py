@@ -3,6 +3,7 @@ from flask import Flask, jsonify
 from flask_jwt_extended import JWTManager
 from flask_mail import Mail
 from flask_socketio import SocketIO
+from src.config import Config
 from src.controllers.user_controller import user_controller
 from src.controllers.auth_controller import auth_controller
 from src.database import DatabaseService, db
@@ -12,16 +13,8 @@ from src.services.socket_service import SocketService
 
 app = Flask(__name__)
 
-app.config['JWT_SECRET_KEY'] = os.getenv("JWT_SECRET_KEY")
-app.config['MAIL_SERVER'] = 'smtp.gmail.com'  # Or 'smtp_container' if running in Docker
-app.config['MAIL_PORT'] = 587
-app.config['MAIL_USE_TLS'] = False
-app.config['MAIL_USE_SSL'] = False
-app.config['MAIL_USERNAME'] = 'louaialoui1993@gmail.com'
-app.config['MAIL_PASSWORD'] = 'ktmobyduilipiteb'
-app.config['MAIL_DEFAULT_SENDER'] = 'louaialoui1993@gmail.com'
-app.config['db'] = db
-
+# Load configuration from the Config class
+app.config.from_object(Config)
 
 # Initialize db with the app
 db_service = DatabaseService(app)

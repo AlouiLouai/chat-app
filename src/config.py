@@ -1,4 +1,5 @@
 import os
+# from src.database import db
 
 class Config:
     # global for app
@@ -9,6 +10,9 @@ class Config:
     POSTGRES_DB = os.getenv("POSTGRES_DB")
     POSTGRES_HOST = os.getenv("POSTGRES_HOST")
     POSTGRES_PORT = os.getenv("POSTGRES_PORT")
+    
+    # jwt
+    JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY")
     
     SQLALCHEMY_DATABASE_URI = f"postgresql://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_HOST}:{POSTGRES_PORT}/{POSTGRES_DB}"
     SQLALCHEMY_TRACK_MODIFICATIONS = False
@@ -22,3 +26,4 @@ class Config:
     MAIL_USERNAME = os.getenv("MAIL_USERNAME")
     MAIL_PASSWORD = os.getenv("MAIL_PASSWORD")
     MAIL_DEFAULT_SENDER = os.getenv("MAIL_DEFAULT_SENDER")
+    # db = db
