@@ -56,7 +56,7 @@ export default function ForgotPasswordPage() {
         <CardHeader>
           <CardTitle>Forgot password?</CardTitle>
           <CardDescription>
-            Enter your email to get the reset password link
+            Enter your email address and we will send you a verification code
           </CardDescription>
         </CardHeader>
         <CardContent>
