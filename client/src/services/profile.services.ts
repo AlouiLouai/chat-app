@@ -15,8 +15,6 @@ export class ProfileService {
           Authorization: `Bearer ${accessToken}`, // Add the token to the Authorization header
         },
       });
-
-      console.log('response : ', response);
       return response.data; // Includes success status, profile data, and message
     } catch (error: any) {
       console.error('Failed to fetch profile:', error.response?.data?.error || error.message);
