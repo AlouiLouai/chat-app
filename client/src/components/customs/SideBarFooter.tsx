@@ -1,15 +1,15 @@
 "use"
 import React, { useState } from "react";
-import { ChevronUp, Home, LogOut, Settings } from "lucide-react";
-import { Button } from "./ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import { Home, LogOut, Settings } from "lucide-react";
+import { Button } from  "../ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import {
   SidebarMenu,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { DropdownMenuContent, DropdownMenuItem } from "@radix-ui/react-dropdown-menu";
 
-export function AppSidebarFooter({ userProfile, handleLogout, router }) {
+export function AppSidebarFooter({ userProfile, handleLogout, router }: AppSidebarFooterProps) {
   const [isExpanded, setIsExpanded] = useState(false);
 
   const toggleExpansion = () => {

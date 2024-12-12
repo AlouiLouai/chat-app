@@ -1,16 +1,40 @@
 "use client";
 import { useEffect, useState } from "react";
 import io, { Socket } from "socket.io-client";
+import Cookie from "js-cookie";
+import { ProfileService } from "@/services/profile.services";
 
 const Chat = () => {
-  const [socket, setSocket] = useState<Socket | null>(null); // Holds the socket connection
-  const [messages, setMessages] = useState<Message[]>([]); // Stores messages
-  const [message, setMessage] = useState(""); // Current input message
-  const [username, setUsername] = useState("User1"); // User's name
+  const [socket, setSocket] = useState<Socket | null>(null); 
+  const [messages, setMessages] = useState<Message[]>([]); 
+  const [message, setMessage] = useState(""); 
+  const [username, setUsername] = useState(""); 
+  const [userlogo, setUserlogo] = useState("");
+  const [currentChannel, setCurrentChannel] = useState<string>(""); 
+
+  const token = Cookie.get('access_token'); 
+
+  // Fetch profile data on component mount
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const { profile } = await ProfileService.getProfile();
+        setUsername(profile.username);
+        setUserlogo(profile.image_url);
+      } catch (error) {
+        console.error("Error fetching profile:", error);
+      }
+    };
+
+    fetchProfile();
+  }, []);
 
   // Connect to Socket.IO server on component mount
   useEffect(() => {
-    const socketConnection = io("http://127.0.0.1:5000");
+    const socketConnection = io("http://127.0.0.1:5000", {
+      query: { token },
+      transports: ['websocket'],
+    });
 
     // Listen for server message when connected
     socketConnection.on("server_message", (data) => {
@@ -20,6 +44,11 @@ const Chat = () => {
     // Listen for received messages
     socketConnection.on("receive_message", (data) => {
       setMessages((prevMessages) => [...prevMessages, data]);
+    });
+
+    // Listen for channel updates (e.g., user joins/leaves channels)
+    socketConnection.on("channel_update", (data) => {
+      // Handle channel updates here, e.g., updating the list of active channels
     });
 
     setSocket(socketConnection); // Save the socket connection
@@ -34,27 +63,46 @@ const Chat = () => {
   const sendMessage = () => {
     if (message.trim() === "") return; // Don't send empty messages
 
-    const messageData = { username, message };
+    const messageData = { username, message, channel: currentChannel };
     socket?.emit("send_message", messageData); // Emit the message to the server
     setMessage(""); // Clear the input field
   };
 
+  // Handle joining a channel
+  const joinChannel = (channel: string) => {
+    socket?.emit("join_channel", { channel });
+    setCurrentChannel(channel); // Set the current channel
+  };
+
+  // Handle leaving the current channel
+  const leaveChannel = () => {
+    if (currentChannel) {
+      socket?.emit("leave_channel", { channel: currentChannel });
+      setCurrentChannel(""); // Clear the current channel
+    }
+  };
+
   return (
     <div>
-      <h1 className="row-start-3 flex gap-6 flex-wrap items-center justify-center pb-6">
-        Chat App
-      </h1>
+      <h1 className="row-start-3 flex gap-6 flex-wrap items-center justify-center pb-6">Chat App</h1>
+
+      <div className="channel-list">
+        <h2>Channels</h2>
+        <button onClick={() => joinChannel("General")}>General</button>
+        <button onClick={() => joinChannel("Random")}>Random</button>
+        <button onClick={leaveChannel}>Leave Channel</button>
+      </div>
 
       <div
         className="rounded-lg border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex flex-col p-4 hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent"
         id="messages"
         style={{
-          maxHeight: "400px", // Adjust this to make the message list bigger
-          height: "auto", // Allow the container to grow with content
-          overflowY: "auto", // Scroll when content exceeds the container size
-          width: "100%", // Make sure the container is full width
-          padding: "1rem", // Add padding around the content
-          borderRadius: "12px", // Rounded corners for the message container
+          maxHeight: "400px",
+          height: "auto",
+          overflowY: "auto",
+          width: "100%",
+          padding: "1rem",
+          borderRadius: "12px",
         }}
       >
         {/* Messages */}

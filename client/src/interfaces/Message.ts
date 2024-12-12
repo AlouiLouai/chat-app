@@ -1,28 +1,16 @@
+
 interface Message {
   username: string;
   message: string;
 }
 
-interface RegisterData {
+interface UserProfile {
   username: string;
-  email: string;
-  password: string;
+  image_url: string;
 }
 
-interface LoginCredentials {
-  username: string;
-  password: string;
-}
-
-interface Tokens {
-  access_token: string;
-  refresh_token: string;
-}
-
-interface ForgotPasswordData {
-  email: string;
-}
-
-interface ResetPasswordData {
-  new_password: string;
+interface AppSidebarFooterProps {
+  userProfile: UserProfile;
+  handleLogout: () => void;
+  router: any;
 }
