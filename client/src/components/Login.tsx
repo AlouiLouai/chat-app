@@ -51,7 +51,7 @@ export default function LoginPage() {
       });
 
       // Navigate to the protected dashboard page
-      router.push("/main"); // Redirect to the dashboard
+      router.push("/in/main"); // Redirect to the dashboard
     } catch (error: any) {
       // Handle login failure
       setErrorMessage(error.message || "Login failed. Please try again.");

@@ -44,7 +44,7 @@ export function AppSidebarFooter({ userProfile, handleLogout, router }: AppSideb
               align="center"
               className="w-56 bg-white rounded shadow-md mt-2 absolute z-10"
             >
-              <DropdownMenuItem onClick={() => router.push("/profile")}>
+              <DropdownMenuItem onClick={() => router.push("/in/profile")}>
                 <Home className="mr-2 h-4 w-4" />
                 <span>Profile</span>
               </DropdownMenuItem>

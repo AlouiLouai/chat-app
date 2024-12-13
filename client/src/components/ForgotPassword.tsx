@@ -84,7 +84,7 @@ export default function ForgotPasswordPage() {
           <div className="mt-4 flex justify-center">
             <Button
               variant="outline"
-              onClick={() => router.push("/main")}
+              onClick={() => router.push("/in/main")}
               className="w-full"
             >
               Return to Main

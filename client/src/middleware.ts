@@ -2,29 +2,17 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 export function middleware(req: NextRequest) {
-
   const token = req.cookies.get("access_token")?.value;
-  if (token) {
-    return NextResponse.next();
-  }
 
-  if (
-    !token &&
-    (
-      req.nextUrl.pathname === "/" ||
-       req.nextUrl.pathname === "/main" ||
-      req.nextUrl.pathname === "/profile"
-      )
-  ) {
+  // Redirect to login if no token exists
+  if (!token) {
     return NextResponse.redirect(new URL("/auth/login", req.url));
   }
 
+  // Allow the request if token exists
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: [
-    "/",
-    "/main"
-  ],
+  matcher: "/in/:path*", // Match all routes under /in/
 };

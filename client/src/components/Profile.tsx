@@ -69,7 +69,7 @@ export default function ProfilePage() {
           description: "Redirecting to main...",
           duration: 5000, // 5 seconds duration
         });
-        router.push("/main");
+        router.push("/in/main");
       } else {
         alert(`Failed to update profile: ${result.message}`);
       }
@@ -80,7 +80,7 @@ export default function ProfilePage() {
   };
 
   const handleReturnToMain = () => {
-    router.push("/main");
+    router.push("/in/main");
   };
 
   return (
