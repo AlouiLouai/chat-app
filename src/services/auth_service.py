@@ -92,6 +92,9 @@ class AuthService:
         user = User.query.filter_by(username=username).first()
         if user and user.check_password(password):
             print("Password is correct, generating tokens...")
+            # Mark the user as active
+            user.is_active = True
+            self.db.session.commit()
             # Create access token (JWT)
             access_token = create_access_token(identity=user.username)
             # Generate refresh token (This should be handled by TokenService)

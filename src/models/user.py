@@ -43,3 +43,12 @@ class User(db.Model):
         Update the `last_seen` timestamp.
         """
         self.last_seen = datetime.now(timezone.utc)
+        
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "username": self.username,
+            "email": self.email,
+            "image_url": self.image_url,
+            "last_seen": self.last_seen,  # Example, include relevant fields here
+        }
