@@ -14,7 +14,7 @@ class Config:
     # jwt
     JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY")
     
-    SQLALCHEMY_DATABASE_URI = f"postgresql://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_HOST}:{POSTGRES_PORT}/{POSTGRES_DB}"
+    #SQLALCHEMY_DATABASE_URI = f"postgresql://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_HOST}:{POSTGRES_PORT}/{POSTGRES_DB}"
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_ECHO = True  # Optional: logs SQL queries
     
@@ -27,3 +27,36 @@ class Config:
     MAIL_PASSWORD = os.getenv("MAIL_PASSWORD")
     MAIL_DEFAULT_SENDER = os.getenv("MAIL_DEFAULT_SENDER")
     # db = db
+    
+    
+class DevelopmentConfig(Config):
+    """Configuration for development."""
+    POSTGRES_USER = os.getenv("POSTGRES_USER")
+    POSTGRES_PASSWORD = os.getenv("POSTGRES_PASSWORD")
+    POSTGRES_DB = os.getenv("POSTGRES_DB")
+    POSTGRES_HOST = os.getenv("POSTGRES_HOST")
+    POSTGRES_PORT = os.getenv("POSTGRES_PORT", 5432)
+    
+    # Database URI for development
+    SQLALCHEMY_DATABASE_URI = (
+        f"postgresql://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_HOST}:{POSTGRES_PORT}/{POSTGRES_DB}"
+    )
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+    SQLALCHEMY_ECHO = True
+    
+class ProductionConfig(Config):
+    """Configuration for production."""
+    SQLALCHEMY_DATABASE_URI = os.getenv("DATABASE_URL")  # Use DATABASE_URL for production
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+    SQLALCHEMY_ECHO = False 
+    
+# Environment mapping
+CONFIG_MAPPING = {
+    "development": DevelopmentConfig,
+    "production": ProductionConfig,
+}
+
+def get_config():
+    """Get the configuration class based on FLASK_ENV."""
+    flask_env = os.getenv("FLASK_ENV", "production").lower()
+    return CONFIG_MAPPING.get(flask_env, ProductionConfig)

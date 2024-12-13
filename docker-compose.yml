@@ -16,33 +16,6 @@ services:
     command: server /data --console-address ":9001"
     networks:
       - flask-network
-  # PostgreSQL service
-  database:
-    image: postgres:14
-    container_name: postgres_container
-    restart: always
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
-    ports:
-      - "${POSTGRES_PORT}:${POSTGRES_PORT}"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
-    networks:
-      - flask-network
-    healthcheck:
-      test: ["CMD", "pg_isready", "-U", "${POSTGRES_USER}"]
-      interval: 30s
-      retries: 3
-      start_period: 5s
-      timeout: 10s
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
 
   # pgAdmin service
   pgadmin:
