@@ -49,11 +49,11 @@ class ProductionConfig(Config):
     
 # Environment mapping
 CONFIG_MAPPING = {
-    "development": DevelopmentConfig,
-    "production": ProductionConfig,
+    "1": DevelopmentConfig,  # FLASK_DEBUG=1 for development
+    "0": ProductionConfig,   # FLASK_DEBUG=0 for production
 }
 
 def get_config():
-    """Get the configuration class based on FLASK_ENV."""
-    flask_env = os.getenv("FLASK_ENV", "production").lower()
-    return CONFIG_MAPPING.get(flask_env, ProductionConfig)
+    """Get the configuration class based on FLASK_DEBUG."""
+    flask_debug = os.getenv("FLASK_DEBUG", "0")  # Default to production (0) if not set
+    return CONFIG_MAPPING.get(flask_debug, ProductionConfig)
