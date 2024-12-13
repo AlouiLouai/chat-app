@@ -52,3 +52,18 @@ def update_profile():
         return jsonify({"success": False, "error": message}), 400
 
     return jsonify({"success": True, "message": message}), 200
+
+@user_controller.route("/users", methods=["GET"])
+@jwt_required()
+def getUsers():
+    """
+    Endpoint to get connected users.
+    """
+    try:
+        user_service = UserService(db=db)
+        users = user_service.get_users()  # List of users serialized as dictionaries
+        return jsonify({"users": users}), 200
+    except Exception as e:
+        current_app.logger.error(f"Error in getUsers: {str(e)}")
+        return jsonify({"error": "Internal Server Error"}), 500
+    

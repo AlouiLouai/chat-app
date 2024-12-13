@@ -4,7 +4,7 @@
 
 
 ### FIXES : 
-    - /main should be blocked by cookie-access
+    - /main should be blocked by cookie-access DONE !!!!!!!!!!!!!
     - socket should run in the client only if there is connected user
     - RADICAL DESIGN FOCUS &
 

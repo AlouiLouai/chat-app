@@ -22,6 +22,23 @@ export class ProfileService {
     }
   }
 
+  // Get users
+  static async getUsers(): Promise<{users: any}> {
+    try {
+      const accessToken = Cookies.get('access_token');
+      const response = await axios.get(`${API_BASE_URL}/user/users`, {
+        withCredentials: true, // Ensures cookies are included in the request
+        headers: {
+          Authorization: `Bearer ${accessToken}`, // Add the token to the Authorization header
+        },
+      });
+      return response.data;
+    } catch (error: any) {
+      console.error('Failed to fetch users:', error.response?.data?.error || error.message);
+      throw new Error(error.response?.data?.error || 'Failed to fetch users');
+    }
+  }
+
   // Update Profile
   static async updateProfile(data: { [key: string]: any }, file?: File): Promise<{ success: boolean; message: string }> {
     try {

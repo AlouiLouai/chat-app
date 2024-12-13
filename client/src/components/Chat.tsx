@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import io, { Socket } from "socket.io-client";
 import Cookie from "js-cookie";
 import { ProfileService } from "@/services/profile.services";
-import { Avatar, AvatarFallback } from "./ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { Send } from "lucide-react";
@@ -11,6 +11,7 @@ import { Send } from "lucide-react";
 const Chat = () => {
   const [socket, setSocket] = useState<Socket | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
+  const [users, setUsers] = useState<any[]>([]);
   const [message, setMessage] = useState("");
   const [username, setUsername] = useState("");
   const [userlogo, setUserlogo] = useState("");
@@ -30,6 +31,19 @@ const Chat = () => {
     };
 
     fetchProfile();
+  }, []);
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const { users } = await ProfileService.getUsers();
+        setUsers(users);
+      } catch (error) {
+        console.error("Error fetching profile:", error);
+      }
+    };
+
+    fetchUsers();
   }, []);
 
   // Connect to Socket.IO server on component mount
@@ -74,15 +88,18 @@ const Chat = () => {
         </div>
         <div className="p-2">
           {/* Placeholder contacts */}
-          {["Alice", "Bob", "Charlie"].map((contact) => (
+          {users.map((contact) => (
             <div
-              key={contact}
+              key={contact.id} // Ensure each user has a unique key, typically by using `id`
               className="flex items-center p-2 hover:bg-gray-100 rounded-lg cursor-pointer"
             >
               <Avatar className="h-10 w-10">
-                <AvatarFallback>{contact[0]}</AvatarFallback>
+              <AvatarImage src={contact.image_url} alt={contact.username} />
+                <AvatarFallback>{contact.username.split(" ").map((n: any) => n[0]).join("")}</AvatarFallback>{" "}
+                {/* Use the first letter of username */}
               </Avatar>
-              <span className="ml-2">{contact}</span>
+              {/* Display the username */}
+              <span className="ml-2">{contact.username}</span>{" "}
             </div>
           ))}
         </div>

@@ -12,13 +12,10 @@ export default async function InLayout({
   const defaultOpen = cookieStore.get("sidebar:state")?.value === "true"
   return (
     <section className="flex h-screen">
-      <SidebarProvider defaultOpen={defaultOpen}>
-        <AppSidebar /> {/* Sidebar occupies space */}
         <div className="flex flex-col w-full">
           <Navbar /> {/* Navbar at the top */}
           <main className="flex-1 overflow-hidden">{children}</main>
         </div>
-      </SidebarProvider>
     </section>
   );
 }
