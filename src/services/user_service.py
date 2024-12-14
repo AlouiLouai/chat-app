@@ -11,13 +11,11 @@ class UserService:
         if not secret_key:
             raise ValueError("SECRET_KEY is not set in the configuration.")
         
-    def get_users(self):
+    def get_users(self, current_user):
         """
         Retrieve all users except the currently connected user.
         """
         try:
-            # Get the identity of the connected user from the JWT token
-            current_user = get_jwt_identity()
             # Retrieve all users except the one matching the current user's username
             users = User.query.filter(User.username != current_user).all()
             # Return the list of users
