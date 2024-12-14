@@ -92,17 +92,23 @@ class AuthService:
         user = User.query.filter_by(username=username).first()
         if user and user.check_password(password):
             print("Password is correct, generating tokens...")
+
             # Mark the user as active
             user.is_active = True
             self.db.session.commit()
-            # Create access token (JWT)
-            access_token = create_access_token(identity=user.username)
+            
+            # Ensure app context is available when creating JWT tokens
+            with current_app.app_context():
+                # Create access token (JWT)
+                access_token = create_access_token(identity=user.username)
+
             # Generate refresh token (This should be handled by TokenService)
             refresh_token = TokenService.generate_refresh_token(user)
             if not access_token or not refresh_token:
                 print("Error generating tokens")
             else:
                 print("Tokens generated successfully")
+            
             # Store the refresh token in the database
             TokenService.store_refresh_token(user, refresh_token)
             return access_token, refresh_token

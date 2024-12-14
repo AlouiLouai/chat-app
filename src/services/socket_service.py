@@ -1,6 +1,6 @@
 from flask_socketio import SocketIO, emit, disconnect
 from flask_jwt_extended import decode_token
-from flask import current_app, request
+from flask import current_app, request, app
 
 class SocketService:
     def __init__(self, app=None):
@@ -20,11 +20,14 @@ class SocketService:
     def validate_token(self, token):
         """
         Validate the JWT token provided by the client and return the decoded token.
+        This function will ensure the app context is pushed for token decoding.
         """
         try:
-            decoded = decode_token(token)
-            current_app.logger.info(f"Decoded token: {decoded}")  # Log the decoded token to debug
-            return decoded  # Return the entire decoded token for further inspection
+            # Explicitly push the app context before calling decode_token
+            with current_app.app_context():
+                decoded = decode_token(token)
+                current_app.logger.info(f"Decoded token: {decoded}")  # Log the decoded token to debug
+                return decoded  # Return the entire decoded token for further inspection
         except Exception as e:
             current_app.logger.error(f"Invalid token: {e}")
             return None
