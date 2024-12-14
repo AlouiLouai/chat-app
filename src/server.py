@@ -29,7 +29,11 @@ except Exception as e:
     print(f"Error creating database tables: {e}")
     
 # Initialize SocketIO
-socketio = SocketIO(app, async_mode='eventlet', cors_allowed_origins=[os.getenv("FRONTEND_APP")])
+socketio = SocketIO(
+    app, 
+    async_mode='eventlet', 
+    cors_allowed_origins=[os.getenv("FRONTEND_APP")]
+)
 
 # Enable CORS for the auth controller only
 #CORS(auth_controller, resources={r"/*": {"origins": "http://localhost:3000"}})
@@ -57,5 +61,4 @@ def index():
     return jsonify({'message': 'Chat server is running!'})
 
 if __name__ == "__main__":
-    with app.app_context():
-        socket_service.socketio.run(app, host="0.0.0.0", port=5000)
+    socketio.run(app, host="0.0.0.0", port=5000)
