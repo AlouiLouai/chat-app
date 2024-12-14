@@ -1,0 +1,12 @@
+# Use the official MinIO image
+FROM quay.io/minio/minio
+
+# Expose the MinIO ports
+EXPOSE 9000 9001
+
+# Set MinIO's environment variables
+ENV MINIO_ROOT_USER=${MINIO_ROOT_USER}
+ENV MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD}
+
+# Start MinIO server
+CMD ["server", "/data", "--console-address", ":9001"]
