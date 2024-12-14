@@ -1,4 +1,3 @@
-from flask_jwt_extended import get_jwt_identity
 from src.models.user import User
 from flask import current_app
 from sqlalchemy.exc import SQLAlchemyError
