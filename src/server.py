@@ -32,12 +32,12 @@ except Exception as e:
 socketio = SocketIO(
     app, 
     async_mode='eventlet', 
-    cors_allowed_origins=[os.getenv("FRONTEND_APP")]
+    cors_allowed_origins="*"
 )
 
 # Enable CORS for the auth controller only
 #CORS(auth_controller, resources={r"/*": {"origins": "http://localhost:3000"}})
-CORS(app, origins=[os.getenv("FRONTEND_APP")], supports_credentials=True)
+CORS(app, origins="*", supports_credentials=True)
 
 socket_service = SocketService(app)
 
