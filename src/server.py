@@ -1,6 +1,3 @@
-import eventlet
-eventlet.monkey_patch()  # This is important to enable async support for sockets
-
 import os
 from flask import Flask, jsonify
 from flask_jwt_extended import JWTManager
