@@ -17,6 +17,10 @@ app = Flask(__name__)
 # Load configuration from the Config class
 app.config.from_object(get_config())
 
+app.config['SQLALCHEMY_POOL_SIZE'] = 10  # Maximum number of connections
+app.config['SQLALCHEMY_POOL_TIMEOUT'] = 30  # Timeout for connections
+app.config['SQLALCHEMY_MAX_OVERFLOW'] = 20  # Number of connections above pool_size
+
 # Initialize db with the app
 db_service = DatabaseService(app)
 
