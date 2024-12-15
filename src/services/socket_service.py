@@ -1,10 +1,11 @@
 from flask_socketio import SocketIO, emit, disconnect
 from flask_jwt_extended import decode_token
-from flask import current_app, request, app
+from flask import request
 
 class SocketService:
     def __init__(self, app=None):
         self.user_sessions = {}  # Map of user IDs to session IDs
+        self.app = app
         if app is not None:
             self.init_app(app)
 
@@ -24,33 +25,34 @@ class SocketService:
         """
         try:
             # Explicitly push the app context before calling decode_token
-            with current_app.app_context():
+            with self.app.app_context():
                 decoded = decode_token(token)
-                current_app.logger.info(f"Decoded token: {decoded}")  # Log the decoded token to debug
+                self.app.logger.info(f"Decoded token: {decoded}")  # Log the decoded token to debug
                 return decoded  # Return the entire decoded token for further inspection
         except Exception as e:
-            current_app.logger.error(f"Invalid token: {e}")
+            self.app.logger.error(f"Invalid token: {e}")
             return None
 
-    def handle_connect(self):
+    def handle_connect(self, token):
         """
         Handle client connection and validate JWT token.
+        The token should be passed explicitly from the client.
         """
-        token = request.args.get('token')
         decoded_token = self.validate_token(token)
         
         if decoded_token:
-            # Extract the user ID from the decoded token, assuming 'identity' is a key in the token
+            # Extract the user ID from the decoded token, assuming 'sub' is the user ID
             user_id = decoded_token.get('sub') 
             if user_id:
-                self.user_sessions[user_id] = request.sid
-                current_app.logger.info(f"User {user_id} connected with session ID {request.sid}")
-                emit('server_message', {'message': 'Welcome to the chat server!'})
+                with self.app.app_context():
+                    self.user_sessions[user_id] = request.sid
+                    self.app.logger.info(f"User {user_id} connected with session ID {request.sid}")
+                    emit('server_message', {'message': 'Welcome to the chat server!'})
             else:
-                current_app.logger.warning('User ID not found in token')
+                self.app.logger.warning('User ID not found in token')
                 disconnect()
         else:
-            current_app.logger.warning('Unauthorized connection attempt')
+            self.app.logger.warning('Unauthorized connection attempt')
             disconnect()
 
     def handle_disconnect(self):
@@ -59,29 +61,31 @@ class SocketService:
         """
         user_id = None
         for uid, sid in self.user_sessions.items():
-            if sid == request.sid:
-                user_id = uid
-                break
+            with self.app.app_context():
+                if sid == request.sid:
+                    user_id = uid
+                    break
         if user_id:
             del self.user_sessions[user_id]
-            current_app.logger.info(f"User {user_id} disconnected")
+            self.app.logger.info(f"User {user_id} disconnected")
 
     def handle_send_message(self, data):
         """
         Route messages to all connected users (broadcast to everyone).
+        The token should be passed explicitly from the client.
         """
-        token = request.args.get('token')
+        token = data.get('token')  # The token is expected to be passed in the data
         decoded_token = self.validate_token(token)
         
         if decoded_token:
             # Broadcast the message to all connected clients
             emit('receive_message', data, broadcast=True)
         else:
-            current_app.logger.warning('Unauthorized attempt to send a message')
+            self.app.logger.warning('Unauthorized attempt to send a message')
             disconnect()
 
     def run(self, host='0.0.0.0', port=5000):
         """
         Run the SocketIO server.
         """
-        self.socketio.run(current_app, debug=True, host=host, port=port)
+        self.socketio.run(self.app, debug=True, host=host, port=port)

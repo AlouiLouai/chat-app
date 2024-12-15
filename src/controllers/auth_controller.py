@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, current_app
 from flask_jwt_extended import get_jwt_identity, jwt_required, set_access_cookies
 from src.services.auth_service import AuthService
 from src.models.user import User
@@ -13,7 +13,7 @@ def register():
     email = data.get('email')
     password = data.get('password')
 
-    auth_service = AuthService(db)
+    auth_service = AuthService(db,current_app)
     user, message = auth_service.register(username, email, password)
 
     if user:

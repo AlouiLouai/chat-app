@@ -2,16 +2,16 @@ from itsdangerous import URLSafeTimedSerializer
 from flask_jwt_extended import create_access_token
 from src.models.user import User
 from src.models.token import Token
-from flask import current_app
 from sqlalchemy.exc import SQLAlchemyError
 from src.services.email_service import EmailService
 from src.services.token_service import TokenService
 
 class AuthService:
-    def __init__(self, db):
+    def __init__(self, db, app):
         self.db = db
-        self.email_service = EmailService
-        secret_key = current_app.config.get('SECRET_KEY')
+        self.app = app
+        self.email_service = EmailService(app)
+        secret_key = self.app.config.get('SECRET_KEY')
         if not secret_key:
             raise ValueError("SECRET_KEY is not set in the configuration.")
         self.serializer = URLSafeTimedSerializer(secret_key)
@@ -43,7 +43,7 @@ class AuthService:
             else:
                 return False, "Failed to send password reset email."
         except Exception as e:
-            current_app.logger.error(f"Error in forgot_password: {str(e)}")
+            self.app.logger.error(f"Error in forgot_password: {str(e)}")
             return False, "An error occurred. Please try again later."
         
     def reset_password(self, token, new_password):
@@ -62,7 +62,7 @@ class AuthService:
             self.db.session.commit()
             return True, "Password reset successfully."
         except Exception as e:
-            current_app.logger.error(f"Error in reset_password: {str(e)}")
+            self.app.logger.error(f"Error in reset_password: {str(e)}")
             return False, "Invalid or expired token."
         
     def register(self, username, email, password):
@@ -82,7 +82,7 @@ class AuthService:
             self.db.session.commit()
             return new_user, "User registered successfully."
         except SQLAlchemyError as e:
-            current_app.logger.error(f"Error during registration: {str(e)}")
+            self.app.logger.error(f"Error during registration: {str(e)}")
             return None, "An error occurred during registration."
 
     def login(self, username, password):
@@ -98,7 +98,7 @@ class AuthService:
             self.db.session.commit()
             
             # Ensure app context is available when creating JWT tokens
-            with current_app.app_context():
+            with self.app.app_context():
                 # Create access token (JWT)
                 access_token = create_access_token(identity=user.username)
 
@@ -126,5 +126,5 @@ class AuthService:
                 return True
             return False
         except SQLAlchemyError as e:
-            current_app.logger.error(f"Error during logout: {str(e)}")
+            self.app.logger.error(f"Error during logout: {str(e)}")
             return False
