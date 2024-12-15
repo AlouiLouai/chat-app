@@ -1,1 +1,0 @@
-web: gunicorn -w 4 -k eventlet src.bootstrap:app

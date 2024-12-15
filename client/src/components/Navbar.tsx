@@ -35,6 +35,9 @@ export function Navbar() {
           email: profile.email,
           image_url: profile.image_url, // Set a default image if none exists
         });
+
+        console.log('UserProfile : ',userProfile)
+
       } catch (error) {
         console.error("Error fetching profile:", error);
       }

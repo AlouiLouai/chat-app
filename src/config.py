@@ -2,6 +2,7 @@ import os
 # from src.database import db
 
 class Config:
+    FLASK_APP = os.getenv("FLASK_APP")
     # global for app
     SECRET_KEY = os.getenv("SECRET_KEY")
     # Environment variables for secure configuration
@@ -64,5 +65,5 @@ CONFIG_MAPPING = {
 
 def get_config():
     """Get the configuration class based on FLASK_DEBUG."""
-    flask_debug = os.getenv("FLASK_DEBUG", "0")  # Default to production (0) if not set
-    return CONFIG_MAPPING.get(flask_debug, ProductionConfig)
+    flask_debug = os.getenv("FLASK_DEBUG", "1")  # Default to production (0) if not set
+    return CONFIG_MAPPING.get(flask_debug, DevelopmentConfig)
