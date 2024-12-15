@@ -3,7 +3,7 @@ from flask import Flask, jsonify
 from flask_jwt_extended import JWTManager
 from flask_mail import Mail
 from flask_socketio import SocketIO
-from src.config import Config
+from src.config import get_config
 from src.controllers.user_controller import user_controller
 from src.controllers.auth_controller import auth_controller
 from src.database import DatabaseService, db
@@ -11,10 +11,15 @@ from flask_cors import CORS
 from src.models.user import User
 from src.services.socket_service import SocketService
 
+
 app = Flask(__name__)
 
 # Load configuration from the Config class
-app.config.from_object(Config)
+app.config.from_object(get_config())
+
+app.config['SQLALCHEMY_POOL_SIZE'] = 10  # Maximum number of connections
+app.config['SQLALCHEMY_POOL_TIMEOUT'] = 30  # Timeout for connections
+app.config['SQLALCHEMY_MAX_OVERFLOW'] = 20  # Number of connections above pool_size
 
 # Initialize db with the app
 db_service = DatabaseService(app)
@@ -28,11 +33,15 @@ except Exception as e:
     print(f"Error creating database tables: {e}")
     
 # Initialize SocketIO
-socketio = SocketIO(app, cors_allowed_origins=[os.getenv("FRONTEND_APP")])
+socketio = SocketIO(
+    app, 
+    async_mode='eventlet', 
+    cors_allowed_origins="*"
+)
 
 # Enable CORS for the auth controller only
 #CORS(auth_controller, resources={r"/*": {"origins": "http://localhost:3000"}})
-CORS(app, origins=[os.getenv("FRONTEND_APP")], supports_credentials=True)
+CORS(app, origins="*", supports_credentials=True)
 
 socket_service = SocketService(app)
 
@@ -56,5 +65,4 @@ def index():
     return jsonify({'message': 'Chat server is running!'})
 
 if __name__ == "__main__":
-    socket_service.run()
     socketio.run(app, host="0.0.0.0", port=5000)

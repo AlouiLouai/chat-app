@@ -1,11 +1,14 @@
 from flask_mail import Message
-from flask import current_app
-
 
 class EmailService:
+    def __init__(self, app=None):
+        if app is not None:
+            self.init_app(app)
+            
+    def init_app(self, app):
+        self.app = app
         
-    @staticmethod
-    def send_email(subject, recipients, body,  html=None):
+    def send_email(self, subject, recipients, body, html=None):
         """
         Sends an email to the specified recipients.
 
@@ -17,11 +20,11 @@ class EmailService:
         """
         try:
             msg = Message(subject, recipients=recipients, body=body, html=html)
-            mail = current_app.extensions.get('mail')
+            mail = self.app.extensions.get('mail')
             if not mail:
                 raise RuntimeError("Mail extension is not initialized in the app.")
             mail.send(msg)
             return True
         except Exception as e:
-            current_app.logger.error(f"Failed to send email: {e}")
+            self.app.logger.error(f"Failed to send email: {e}")
             return False
