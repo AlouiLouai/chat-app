@@ -6,7 +6,8 @@ import { ProfileService } from "@/services/profile.services";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
-import { Send } from "lucide-react";
+import { Send, Smile } from "lucide-react";
+import EmojiPicker from "emoji-picker-react";
 
 const Chat = () => {
   const [socket, setSocket] = useState<Socket | null>(null);
@@ -15,6 +16,7 @@ const Chat = () => {
   const [message, setMessage] = useState("");
   const [username, setUsername] = useState("");
   const [userlogo, setUserlogo] = useState("");
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false); // State to toggle emoji picker
 
   const token = Cookie.get("access_token");
 
@@ -79,6 +81,12 @@ const Chat = () => {
     setMessage(""); // Clear the input field
   };
 
+  // Handle emoji selection
+  const handleEmojiClick = (emojiData: any) => {
+    setMessage((prevMessage) => prevMessage + emojiData.emoji); // Append emoji to the current message
+    setShowEmojiPicker(false); // Close the emoji picker after selection
+  };
+
   return (
     <div className="flex flex-1">
       {/* Sidebar */}
@@ -94,8 +102,13 @@ const Chat = () => {
               className="flex items-center p-2 hover:bg-gray-100 rounded-lg cursor-pointer"
             >
               <Avatar className="h-10 w-10">
-              <AvatarImage src={contact.image_url} alt={contact.username} />
-                <AvatarFallback>{contact.username.split(" ").map((n: any) => n[0]).join("")}</AvatarFallback>{" "}
+                <AvatarImage src={contact.image_url} alt={contact.username} />
+                <AvatarFallback>
+                  {contact.username
+                    .split(" ")
+                    .map((n: any) => n[0])
+                    .join("")}
+                </AvatarFallback>{" "}
                 {/* Use the first letter of username */}
               </Avatar>
               {/* Display the username */}
@@ -150,10 +163,23 @@ const Chat = () => {
               placeholder="Type a message..."
               className="flex-1 mr-2"
             />
+            <Button
+              type="button"
+              size="icon"
+              onClick={() => setShowEmojiPicker((prev) => !prev)}
+              className="mr-2"
+            >
+              <Smile className="h-4 w-4" />
+            </Button>
             <Button type="submit" size="icon">
               <Send className="h-4 w-4" />
             </Button>
           </form>
+          {showEmojiPicker && (
+            <div className="absolute bottom-16 right-4 z-10">
+              <EmojiPicker onEmojiClick={handleEmojiClick} />
+            </div>
+          )}
         </div>
       </div>
     </div>

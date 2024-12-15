@@ -2,6 +2,7 @@ import os
 # from src.database import db
 
 class Config:
+    FLASK_APP = os.getenv("FLASK_APP")
     # global for app
     SECRET_KEY = os.getenv("SECRET_KEY")
     # Environment variables for secure configuration
