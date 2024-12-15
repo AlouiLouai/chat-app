@@ -6,6 +6,8 @@ from src.database import db
 
 auth_controller = Blueprint('auth', __name__)
 
+auth_service = AuthService(db,current_app)
+
 @auth_controller.route('/register', methods=['POST'])
 def register():
     data = request.get_json()
@@ -13,7 +15,6 @@ def register():
     email = data.get('email')
     password = data.get('password')
 
-    auth_service = AuthService(db,current_app)
     user, message = auth_service.register(username, email, password)
 
     if user:
@@ -27,7 +28,6 @@ def login():
     data = request.get_json()
     username = data.get('username')
     password = data.get('password')
-    auth_service = AuthService(db)
     access_token, refresh_token = auth_service.login(username, password)
     if access_token:
         # Create a response object
@@ -45,7 +45,6 @@ def logout():
     data = request.get_json()
     refresh_token = data.get('refresh_token')
 
-    auth_service = AuthService(db)
     success = auth_service.logout(refresh_token)
 
     if success:
@@ -60,7 +59,6 @@ def forgot_password():
     if not email:
         return jsonify({"message": "Email is required"}), 400
 
-    auth_service = AuthService(db)
     success, message = auth_service.forgot_password(email)
 
     if success:
@@ -75,7 +73,6 @@ def reset_password(token):
     if not new_password:
         return jsonify({"message": "New password is required"}), 400
 
-    auth_service = AuthService(db)
     success, message = auth_service.reset_password(token, new_password)
 
     if success:
