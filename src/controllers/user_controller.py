@@ -6,7 +6,6 @@ from src.database import db
 
 user_controller = Blueprint('user', __name__)
 
-user_service = UserService(db=db,app=current_app)
     
 @user_controller.route("/profile", methods=["GET"])
 @jwt_required()
@@ -16,6 +15,7 @@ def get_profile():
     """
     current_user = get_jwt_identity()  # Retrieve the current user's username (or ID)
     try:
+        user_service = UserService(db=db,app=current_app)
         profile, message = user_service.get_profile(user_id=current_user)
         if not profile:
             return jsonify({"success": False, "error": message}), 404
@@ -36,6 +36,7 @@ def update_profile():
     file = request.files.get("file")
     
     try:
+        user_service = UserService(db=db,app=current_app)
         success, message = user_service.update_profile(username=current_user, data=data, file=file)
         if not success:
             return jsonify({"success": False, "error": message}), 400
@@ -52,6 +53,7 @@ def get_users():
     """
     current_user = get_jwt_identity()  # Retrieve the current user's username (or ID)
     try:
+        user_service = UserService(db=db,app=current_app)
         users = user_service.get_users(current_user=current_user)  # Pass the current_user to filter
         return jsonify({"users": users}), 200
     except Exception as e:

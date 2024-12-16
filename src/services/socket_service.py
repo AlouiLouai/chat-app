@@ -1,11 +1,13 @@
 from flask_socketio import SocketIO, emit, disconnect
 from flask_jwt_extended import decode_token
 from flask import request
+from src.helpers.session_manager import SessionManager
 
 class SocketService:
     def __init__(self, app=None):
-        self.user_sessions = {}  # Map of user IDs to session IDs
         self.app = app
+        self.socketio = None
+        self.session_manager = SessionManager()
         if app is not None:
             self.init_app(app)
 
@@ -14,74 +16,72 @@ class SocketService:
         Initialize the SocketIO app with CORS and other settings.
         """
         self.socketio = SocketIO(app, cors_allowed_origins=["http://localhost:3000"])
-        self.socketio.on_event('connect', self.handle_connect)
-        self.socketio.on_event('disconnect', self.handle_disconnect)
-        self.socketio.on_event('send_message', self.handle_send_message)
+        self.register_events()
+        
+    def register_events(self):
+        """
+        Register socket event handlers
+        """
+        @self.socketio.on('connect')
+        def on_connect():
+            token = request.args.get('token')
+            self.handle_connect(token)
+
+        @self.socketio.on('disconnect')
+        def on_disconnect():
+            self.handle_disconnect()
+
+        @self.socketio.on('send_message')
+        def on_send_message(data):
+            self.handle_send_message(data)
 
     def validate_token(self, token):
         """
-        Validate the JWT token provided by the client and return the decoded token.
-        This function will ensure the app context is pushed for token decoding.
+        Validate the JWT token and return the decoded payload.
         """
         try:
-            # Explicitly push the app context before calling decode_token
             with self.app.app_context():
-                decoded = decode_token(token)
-                self.app.logger.info(f"Decoded token: {decoded}")  # Log the decoded token to debug
-                return decoded  # Return the entire decoded token for further inspection
+                return decode_token(token)
         except Exception as e:
             self.app.logger.error(f"Invalid token: {e}")
             return None
 
     def handle_connect(self, token):
         """
-        Handle client connection and validate JWT token.
-        The token should be passed explicitly from the client.
+        Handle new client connection.
         """
         decoded_token = self.validate_token(token)
-        
         if decoded_token:
-            # Extract the user ID from the decoded token, assuming 'sub' is the user ID
-            user_id = decoded_token.get('sub') 
+            user_id = decoded_token.get('sub')
             if user_id:
-                with self.app.app_context():
-                    self.user_sessions[user_id] = request.sid
-                    self.app.logger.info(f"User {user_id} connected with session ID {request.sid}")
-                    emit('server_message', {'message': 'Welcome to the chat server!'})
+                self.session_manager.add_session(user_id, request.sid)
+                self.app.logger.info(f"User {user_id} connected with SID {request.sid}")
+                emit('server_message', {'message': 'Welcome!'}, room=request.sid)
             else:
-                self.app.logger.warning('User ID not found in token')
+                self.app.logger.warning('Token does not contain user ID.')
                 disconnect()
         else:
-            self.app.logger.warning('Unauthorized connection attempt')
+            self.app.logger.warning('Unauthorized connection attempt.')
             disconnect()
 
     def handle_disconnect(self):
         """
         Handle client disconnection.
         """
-        user_id = None
-        for uid, sid in self.user_sessions.items():
-            with self.app.app_context():
-                if sid == request.sid:
-                    user_id = uid
-                    break
+        user_id = self.session_manager.remove_session(request.sid)
         if user_id:
-            del self.user_sessions[user_id]
-            self.app.logger.info(f"User {user_id} disconnected")
+            self.app.logger.info(f"User {user_id} disconnected.")
 
     def handle_send_message(self, data):
         """
-        Route messages to all connected users (broadcast to everyone).
-        The token should be passed explicitly from the client.
+        Handle message broadcasting.
         """
-        token = data.get('token')  # The token is expected to be passed in the data
+        token = data.get('token')
         decoded_token = self.validate_token(token)
-        
         if decoded_token:
-            # Broadcast the message to all connected clients
             emit('receive_message', data, broadcast=True)
         else:
-            self.app.logger.warning('Unauthorized attempt to send a message')
+            self.app.logger.warning('Unauthorized message attempt.')
             disconnect()
 
     def run(self, host='0.0.0.0', port=5000):

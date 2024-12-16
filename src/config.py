@@ -29,6 +29,7 @@ class Config:
     
 class DevelopmentConfig(Config):
     """Configuration for development."""
+    FLASK_APP = os.getenv("FLASK_APP")
     POSTGRES_USER = os.getenv("POSTGRES_USER")
     POSTGRES_PASSWORD = os.getenv("POSTGRES_PASSWORD")
     POSTGRES_DB = os.getenv("POSTGRES_DB")
@@ -65,5 +66,5 @@ CONFIG_MAPPING = {
 
 def get_config():
     """Get the configuration class based on FLASK_DEBUG."""
-    flask_debug = os.getenv("FLASK_DEBUG", "1")  # Default to production (0) if not set
+    flask_debug = os.getenv("FLASK_DEBUG", "1")
     return CONFIG_MAPPING.get(flask_debug, DevelopmentConfig)

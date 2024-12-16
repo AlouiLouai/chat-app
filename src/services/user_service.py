@@ -6,9 +6,8 @@ class UserService:
     def __init__(self, db, app):
         self.db = db
         self.app = app
-        secret_key = self.app.config.get('SECRET_KEY')
-        if not secret_key:
-            raise ValueError("SECRET_KEY is not set in the configuration.")
+        with self.app.app_context():
+            self.secret_key = self.app.config.get('SECRET_KEY')
         
     def get_users(self, current_user):
         """

@@ -1,10 +1,8 @@
 # login with google
 
-# chadcn block had better chatting and blog chat interfaces
-
 
 ### FIXES : 
-    - /main should be blocked by cookie-access DONE !!!!!!!!!!!!!
-    - socket should run in the client only if there is connected user
-    - RADICAL DESIGN FOCUS &
+
+- save chats to database
+- think bigger about musing caching mechanism
 
