@@ -70,7 +70,7 @@ const Chat = () => {
     return () => {
       socketConnection.disconnect();
     };
-  }, []);
+  }, [token]);
 
   // Handle sending message to the server
   const sendMessage = () => {
