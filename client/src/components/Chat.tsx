@@ -8,6 +8,7 @@ import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { Send, Smile } from "lucide-react";
 import EmojiPicker from "emoji-picker-react";
+import { MessageService } from "@/services/message.services";
 
 const Chat = () => {
   const [socket, setSocket] = useState<typeof Socket | null>(null);
@@ -47,6 +48,18 @@ const Chat = () => {
 
     fetchUsers();
   }, []);
+
+  useEffect(() => {
+    const fetchMessages = async () => {
+      try {
+        const { messages } = await MessageService.getMessages();
+        setMessages(messages)
+      } catch (error) {
+        console.error("Error fetching messages:", error);
+      }
+    }
+    fetchMessages()
+  }, [])
 
   // Connect to Socket.IO server on component mount
   useEffect(() => {
