@@ -2,7 +2,6 @@ import os
 from flask import Flask, jsonify
 from flask_jwt_extended import JWTManager
 from flask_mail import Mail
-from flask_socketio import SocketIO
 from src.config import get_config
 from src.controllers.user_controller import user_controller
 from src.controllers.auth_controller import auth_controller
@@ -28,18 +27,15 @@ try:
 except Exception as e:
     print(f"Error creating database tables: {e}")
     
-# Initialize SocketIO
-socketio = SocketIO(
-    app, 
-    async_mode='eventlet', 
-    cors_allowed_origins="http://localhost:3000"
-)
 
 # Enable CORS for the auth controller only
 #CORS(auth_controller, resources={r"/*": {"origins": "http://localhost:3000"}})
-CORS(app, origins="http://localhost:3000", supports_credentials=True)
+CORS(app, origins="*", supports_credentials=True)
 
-socket_service = SocketService(app)
+socket_service = SocketService(app, db=db)
+
+# Use the socketio from socket_service
+socketio = socket_service.socketio
 
 jwt = JWTManager(app)
 

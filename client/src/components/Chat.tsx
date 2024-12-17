@@ -10,7 +10,7 @@ import { Send, Smile } from "lucide-react";
 import EmojiPicker from "emoji-picker-react";
 
 const Chat = () => {
-  const [socket, setSocket] = useState<Socket | null>(null);
+  const [socket, setSocket] = useState<typeof Socket | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [users, setUsers] = useState<any[]>([]);
   const [message, setMessage] = useState("");
@@ -51,17 +51,20 @@ const Chat = () => {
   // Connect to Socket.IO server on component mount
   useEffect(() => {
     const socketConnection = io("http://127.0.0.1:5000", {
-      query: { token },
+      query: { token: token },
     });
 
     // Listen for server message when connected
-    socketConnection.on("server_message", (data) => {
+    socketConnection.on("server_message", (data: any) => {
       console.log(data.message); // Log server's message to the console
     });
 
     // Listen for received messages
-    socketConnection.on("receive_message", (data) => {
-      setMessages((prevMessages) => [...prevMessages, data]);
+    socketConnection.on("receive_message", (data: any) => {
+      setMessages((prevMessages) => [
+        ...prevMessages,
+        { username: data.username, message: data.message },
+      ]);
     });
 
     setSocket(socketConnection); // Save the socket connection
@@ -141,7 +144,8 @@ const Chat = () => {
                     : "bg-gray-200"
                 }`}
               >
-                {msg.message}
+                {/* Display username */}
+                <p>{msg.message}</p> {/* Display message content */}
               </div>
             </div>
           ))}
