@@ -22,12 +22,12 @@ class UserService:
             print(f"Error retrieving users: {e}")
             return []
         
-    def get_profile(self, id):
+    def get_profile(self, username):
         """
         Retrieve the profile of the specified user.
         """
         try:
-            user = User.query.filter_by(id=id).first()
+            user = User.query.filter_by(username=username).first()
             if not user:
                 return None, "User not found."
             

@@ -16,7 +16,7 @@ def get_profile():
     current_user = get_jwt_identity()  # Retrieve the current user's username (or ID)
     try:
         user_service = UserService(db=db,app=current_app)
-        profile, message = user_service.get_profile(user_id=current_user)
+        profile, message = user_service.get_profile(username=current_user)
         if not profile:
             return jsonify({"success": False, "error": message}), 404
         return jsonify({"success": True, "profile": profile, "message": message}), 200

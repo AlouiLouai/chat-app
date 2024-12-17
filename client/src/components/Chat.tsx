@@ -8,9 +8,10 @@ import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { Send, Smile } from "lucide-react";
 import EmojiPicker from "emoji-picker-react";
+import { MessageService } from "@/services/message.services";
 
 const Chat = () => {
-  const [socket, setSocket] = useState<Socket | null>(null);
+  const [socket, setSocket] = useState<typeof Socket | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [users, setUsers] = useState<any[]>([]);
   const [message, setMessage] = useState("");
@@ -48,20 +49,35 @@ const Chat = () => {
     fetchUsers();
   }, []);
 
+  useEffect(() => {
+    const fetchMessages = async () => {
+      try {
+        const { messages } = await MessageService.getMessages();
+        setMessages(messages)
+      } catch (error) {
+        console.error("Error fetching messages:", error);
+      }
+    }
+    fetchMessages()
+  }, [])
+
   // Connect to Socket.IO server on component mount
   useEffect(() => {
     const socketConnection = io("http://127.0.0.1:5000", {
-      query: { token },
+      query: { token: token },
     });
 
     // Listen for server message when connected
-    socketConnection.on("server_message", (data) => {
+    socketConnection.on("server_message", (data: any) => {
       console.log(data.message); // Log server's message to the console
     });
 
     // Listen for received messages
-    socketConnection.on("receive_message", (data) => {
-      setMessages((prevMessages) => [...prevMessages, data]);
+    socketConnection.on("receive_message", (data: any) => {
+      setMessages((prevMessages) => [
+        ...prevMessages,
+        { username: data.username, message: data.message },
+      ]);
     });
 
     setSocket(socketConnection); // Save the socket connection
@@ -70,7 +86,7 @@ const Chat = () => {
     return () => {
       socketConnection.disconnect();
     };
-  }, []);
+  }, [token]);
 
   // Handle sending message to the server
   const sendMessage = () => {
@@ -141,7 +157,8 @@ const Chat = () => {
                     : "bg-gray-200"
                 }`}
               >
-                {msg.message}
+                {/* Display username */}
+                <p>{msg.message}</p> {/* Display message content */}
               </div>
             </div>
           ))}
