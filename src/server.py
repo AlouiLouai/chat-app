@@ -3,6 +3,7 @@ from flask import Flask, jsonify
 from flask_jwt_extended import JWTManager
 from flask_mail import Mail
 from src.config import get_config
+from src.controllers.message_controller import message_controller
 from src.controllers.user_controller import user_controller
 from src.controllers.auth_controller import auth_controller
 from src.database import DatabaseService, db
@@ -51,6 +52,7 @@ with app.app_context():
 # Register the auth_controller blueprint with the app
 app.register_blueprint(auth_controller, url_prefix='/auth')
 app.register_blueprint(user_controller, url_prefix='/user')
+app.register_blueprint(message_controller, url_prefix='/message')
 
 @app.route("/")
 def index():
